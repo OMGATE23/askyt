@@ -18,16 +18,16 @@ def get_video_player_url(video_id: str):
     return {"error": str(e)}
 
 def get_video_urls():
-    try:
-        coll = conn.get_collection()
+  try:
+    coll = conn.get_collection()
 
-        videos = []
-        for video in coll.get_videos():
-          videos.append({"player_url":video.player_url, "id": video.id})
-        return {"collection": coll.id, "videos": videos}
+    videos = []
+    for video in coll.get_videos():
+      videos.append({"player_url":video.player_url, "id": video.id, "title": video.name})
+    return {"collection": coll.id, "videos": videos}
 
-    except Exception as e:
-        return {"error": str(e)}
+  except Exception as e:
+    return {"error": str(e)}
 
 
 def upload_video(url: str):
@@ -37,17 +37,16 @@ def upload_video(url: str):
       video =  coll.upload(url=url)
       video.index_spoken_words()
 
-      index_id = video.index_scenes(
+      video.index_scenes(
           extraction_type=SceneExtractionType.time_based,
           extraction_config={"time": 2, "select_frames": ['first', 'last']},
           prompt="Describe the scene in detail"
       )
 
-      scene_index = video.get_scene_index(index_id)
       return {
         "message": "Video Uploaded Successfully", 
         "video_id": video.id,
-        "scene_index": scene_index
+        "player_url": video.player_url
       }
     
     except Exception as e:
@@ -61,21 +60,16 @@ def process_scene_prompt(prompt: str):
         query=prompt,
     )
 
-    videos = coll.get_videos()
-    results = []
     shots = []
-    for video in videos:
-      result = video.search(query=prompt, index_type=IndexType.scene, search_type=SearchType.semantic)
-      for video_shot in result.shots:
-        print(video_shot)
-        shots.append({
-           "start": video_shot.start, 
-           "end": video_shot.end, 
-           "text": video_shot.text,
-           "video_id": video_shot.video_id
-        })
-      results.append({"player_url":result.player_url, "play": result.play})
+    for video_shot in scene_results.shots:
+      print(video_shot)
+      shots.append({
+        "start": video_shot.start, 
+        "end": video_shot.end, 
+        "text": video_shot.text,
+        "video_id": video_shot.video_id
+      })
     
-    return {"results": results , "prompt": prompt, "shots": shots}
+    return {"prompt": prompt, "results": shots}
   except Exception as e:
     return {"error": str(e)}
