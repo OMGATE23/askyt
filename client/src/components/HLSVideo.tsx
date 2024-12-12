@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 import { toast } from 'sonner';
 import '../App.css'
@@ -21,7 +21,6 @@ const HLSVideo = ({
   startTime = 0,
 }: Props) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isFlashing, setIsFlashing] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -51,25 +50,20 @@ const HLSVideo = ({
   useEffect(() => {
     const video = videoRef.current;
     if (video && startTime > 0) {
+      console.log('Changing start time', startTime)
       video.currentTime = startTime;
-      video.play().catch(() => toast.error("Couldn't play the video"));
+      video.play().catch(() => console.log("Couldn't play the video"));
     }
   }, [startTime]);
 
-  useEffect(() => {
-    setIsFlashing(true);
-    const timer = setTimeout(() => setIsFlashing(false), 1000);
-    return () => clearTimeout(timer);
-  }, [startTime]);
-
   return (
-    <div className={`relative ${isFlashing ? 'flash' : ''}`}>
+    <div className='p-4'>
       <video
         ref={videoRef}
         width={width}
         controls={controls}
         autoPlay={autoPlay}
-        className={className}
+        className={`${className} ${startTime > 0 && 'flash-effect'}`}
       />
     </div>
   );

@@ -3,40 +3,35 @@ import { useEffect, useState } from 'react';
 interface Props {
   text: string;
   className?: string;
+  delay?: number;
 }
 
-export default function StaggeredText(props: Props) {
-  const [displayedText, setDisplayedText] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+export default function StaggeredText({ text, className, delay = 50 }: Props): JSX.Element {
+  const [displayedWords, setDisplayedWords] = useState<string[]>([]);
 
   useEffect(() => {
-    const delay = 5;
+    const words = text.split(' ');
     let index = 0;
 
-    setIsTyping(true);
     const interval = setInterval(() => {
-      if (index < props.text.length - 1) {
-        setDisplayedText((prev) => prev + props.text[index]);
+      if (index < words.length) {
+        setDisplayedWords((prev) => [...prev, words[index]]);
         index++;
       } else {
         clearInterval(interval);
-        setIsTyping(false);
       }
     }, delay);
 
     return () => clearInterval(interval);
-  }, [props.text]);
+  }, [text, delay]);
 
   return (
-    <div className={`staggered-text ${props.className || ''}`}>
-      {displayedText.split('').map((char, index) => (
-        <span
-          key={index}
-          className={`char char-${index + 1} ${isTyping ? 'typing' : ''}`}
-        >
-          {char}
+    <div className={`staggered-text ${className || ''}`}>
+      {displayedWords.map((word, idx) => (
+        <span key={idx} className={`word word-${idx}`}>
+          {word}{' '}
         </span>
       ))}
     </div>
   );
-};
+}

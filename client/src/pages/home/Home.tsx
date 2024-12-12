@@ -26,7 +26,7 @@ function Home() {
   }
   return (
     <div>
-      <div className="h-[80vh] flex flex-col justify-center items-center gap-8 w-full">
+      <div className="min-h-[80vh] pb-12 flex flex-col justify-center items-center gap-8 w-full">
         <Upload setReloadToken={setFetchVideosToken} />
         <Videos videos={videos} />
       </div>

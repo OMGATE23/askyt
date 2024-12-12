@@ -7,7 +7,7 @@ import Header from "./components/Header";
 function App() {
   
   return (
-    <>
+    <div className="max-w-[100vw] relative">
       <Router>
         <Header/>
         <Routes>
@@ -17,7 +17,8 @@ function App() {
         </Routes>
       </Router>
       <Toaster/>
-    </>
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-white via-white to-purple-200 opacity-70 z-[-10]" />
+    </div>
   )
 }
 

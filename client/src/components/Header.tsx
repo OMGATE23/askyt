@@ -9,7 +9,7 @@ export default function Header() {
         aria-label="Logo: Click to go to home"
         className="flex items-center gap-2 text-xl font-semibold text-slate-900"
       >
-        <MixIcon className="size-5"/> Chaty
+        <MixIcon className="size-5"/> AskYT
       </Link>
 
       <div className="flex items-center gap-4">

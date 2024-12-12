@@ -105,12 +105,14 @@ export default function VideoSearch() {
             </div>
 
             <div className="mt-6 w-full max-w-md">
-              <h2 className="text-lg font-semibold">Results:</h2>
+              <h2 className="text-lg font-semibold">
+                { results.length > 0 ? "Results:" : "Search anything, and we will find it from your videos!"}
+              </h2>
               {!loading ? <ul className="list-disc ml-5">
                 {results.map((result, index) => (
                   <li key={index} className="mb-2">
-                    <p>{result.name}</p>
-                    <StaggeredText className="text-neutral-700" text={result.text} />
+                    <p className="">{result.name}</p>
+                    <StaggeredText className="mt-4" text={result.text} />
                   </li>
                 ))}
               </ul> : (
