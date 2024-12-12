@@ -18,3 +18,16 @@ export interface Resp_Video {
   player_url: string;
   title: string;
 }
+
+export interface Resp_Search_Results {
+  start: number;
+  end: number;
+  text: string;
+  name: string;
+  video_id: string;
+}
+
+export interface Resp_Search {
+  prompt: string;
+  results: Resp_Search_Results[]
+}

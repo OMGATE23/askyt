@@ -1,7 +1,7 @@
 from ..config.videodb import conn
 import os
 from dotenv import load_dotenv
-from videodb import SceneExtractionType, SearchType, IndexType
+from videodb import SceneExtractionType
 
 load_dotenv()
 
@@ -13,7 +13,7 @@ def get_video_player_url(video_id: str):
     if video is None:
        raise Exception("video not found")
     
-    return {"message": "Video Found", "player_url": video.player_url}
+    return {"message": "Video Found", "player_url": video.player_url, "title": video.name, "id": video.id}
   except Exception as e:
     return {"error": str(e)}
 
@@ -32,11 +32,10 @@ def get_video_urls():
 
 def upload_video(url: str):
     try:
-      
+      print(url)
       coll = conn.get_collection()
       video =  coll.upload(url=url)
       video.index_spoken_words()
-
       video.index_scenes(
           extraction_type=SceneExtractionType.time_based,
           extraction_config={"time": 2, "select_frames": ['first', 'last']},
@@ -62,14 +61,41 @@ def process_scene_prompt(prompt: str):
 
     shots = []
     for video_shot in scene_results.shots:
-      print(video_shot)
+      if video_shot.search_score >=0.4:
+        shots.append({
+          "start": video_shot.start, 
+          "end": video_shot.end, 
+          "text": video_shot.text,
+          "video_id": video_shot.video_id,
+          "name": video_shot.video_title
+        })
+    
+    return {"prompt": prompt, "results": shots}
+  except Exception as e:
+    return {"error": str(e)}
+
+def search_in_video(video_id: str, prompt: str):
+  try:
+    coll = conn.get_collection()
+    video = coll.get_video(video_id=video_id)
+
+    if video is None:
+      return {"error": "Video not found for the given video_id"}
+
+    scene_results = video.search(
+      query=prompt,
+    )
+
+    shots = []
+    for video_shot in scene_results.shots:
       shots.append({
         "start": video_shot.start, 
         "end": video_shot.end, 
         "text": video_shot.text,
-        "video_id": video_shot.video_id
+        "video_id": video_shot.video_id,
+        "name": video_shot.video_title
       })
-    
+
     return {"prompt": prompt, "results": shots}
   except Exception as e:
     return {"error": str(e)}
